@@ -2,16 +2,22 @@ package webrtc.signaling.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RestController;
+import webrtc.signaling.repository.WebcamKeyRepository;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class SignallingController {
+
+    @Autowired
+    WebcamKeyRepository webcamKeyRepository;
 
     @MessageMapping("/webcam/offer/{webcamId}")
     @SendTo("/queue/webcam/offer/{webcamId}")
@@ -34,4 +40,9 @@ public class SignallingController {
         return iceCandidate;
     }
 
+    @MessageMapping("/webcam/initiate")
+    public void webcamConnectionInitiate(@Payload String initiateKey) {
+        Long id = webcamKeyRepository.save(initiateKey);
+        log.info("id={}, initiateKey={}", id, initiateKey);
+    }
 }
