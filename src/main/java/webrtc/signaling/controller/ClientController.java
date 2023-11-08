@@ -1,5 +1,6 @@
 package webrtc.signaling.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,6 +10,7 @@ import webrtc.signaling.repository.WebcamKeyRepository;
 
 import java.util.List;
 
+@Slf4j
 @Controller
 public class ClientController {
 
@@ -25,9 +27,10 @@ public class ClientController {
     }
 
     @GetMapping("/client/{camId}")
-    public String clientChannel(@PathVariable String camId, Model model) {
+    public String clientChannel(@PathVariable Long camId, Model model) {
 
-        model.addAttribute("camId", camId);
+        String camKey = webcamKeyRepository.getKey(camId);
+        model.addAttribute("camKey", camKey);
 
         return "client/channel-choose";
     }

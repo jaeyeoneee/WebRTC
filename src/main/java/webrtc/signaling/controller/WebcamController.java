@@ -10,7 +10,6 @@ public class WebcamController {
 
     @GetMapping("/webcam")
     public String videoStream() {
-        log.info("/webcam");
         return "webcam/webcam-streaming";
     }
 }

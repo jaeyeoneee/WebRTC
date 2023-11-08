@@ -22,8 +22,14 @@ async function connect(){
         console.log(frame);
 
         stompClient.subscribe('/queue/webcam/offer/' + myCamKey,  (offer) =>{
-           //데이터 가져오기 (추후 테스트 필요함)
+            var userKey = JSON.parse(offer.body)["userKey"];
+            var userSDP = JSON.parse(offer.body)["offer"];
+            console.log("userKey="+userKey+", userSDP="+userSDP);
 
+            var localPeer = createPeer();
+            localPeer.setRemoteDescription(new RTCSessionDescription(userSDP))
+            pcListMap.set(userKey, localPeer);
+            sendAnswer(userKey);
         })
 
         stompClient.subscribe('/queue/webcam/iceCandidate/' + myCamKey, (iceCandidate)=>{
@@ -36,5 +42,33 @@ async function connect(){
     })
 }
 
+function sendAnswer(userKey){
+    let localPeer = pcListMap.get(userKey);
+    localPeer.createAnswer().then(description => {
+        localPeer.setLocalDescription(description);
+        console.log("setting Local Description");
+        console.log(description);
+        stompClient.send("/app/webcam/answer/"+userKey, {}, JSON.stringify({
+            "camKey" : myCamKey,
+            "answer" : description
+        }));
+    })
+}
 
+function createPeer(){
+    let peer = new RTCPeerConnection();
+
+    // begin sending the local video across the peer connection
+    localStream.getTracks().forEach((track) => {
+        peer.addTrack(track, localStream);
+    })
+
+    peer.onicecandidate = (event) => {
+        // candidate message 만들고, 서버의 웹캠 엔드포인트에 전송해준다.
+    }
+
+    return peer;
+}
+
+getLocalStream();
 connect();
