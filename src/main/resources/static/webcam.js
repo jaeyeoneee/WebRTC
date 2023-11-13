@@ -3,13 +3,6 @@ const myCamKey = Math.random().toString(36).substring(2, 12);
 let pcListMap = new Map();
 let localStream;
 
-const configuration = {
-    iceServers: [
-        {
-            urls: "stun:stun.l.google.com:19302" // STUN 서버 주소
-        }
-    ]
-};
 
 async function getLocalStream(){
     try {
@@ -34,9 +27,8 @@ async function connect(){
             var userSDP = JSON.parse(offer.body)["offer"];
             console.log("userKey="+userKey+", userSDP="+userSDP);
 
-            var localPeer = createPeer(userKey);
+            var localPeer = returnPeer(userKey);
             localPeer.setRemoteDescription(new RTCSessionDescription(userSDP))
-            pcListMap.set(userKey, localPeer);
             sendAnswer(userKey);
         })
 
@@ -44,10 +36,7 @@ async function connect(){
             var userKey = JSON.parse(iceCandidate.body)["userKey"];
             var message = JSON.parse(iceCandidate.body)["candidate"];
 
-            var localPeer = pcListMap.get(userKey);
-            console.log("localpeer is undefined test");
-            console.log(localPeer);
-
+            var localPeer = returnPeer(userKey);
 
             candidate = new RTCIceCandidate({
                 candidate: message.candidate,
@@ -56,13 +45,9 @@ async function connect(){
             })
 
             localPeer.addIceCandidate(candidate);
-
-            console.log("candidate accepted");
-            console.log(candidate);
-            console.log(localPeer);
         })
 
-        //TODO:subscribe가 보장
+        //TODO:subscribe가 보장, 이후에 resolve 추가하면서
         stompClient.send('/app/webcam/initiate', {}, myCamKey);
 
     })
@@ -81,8 +66,18 @@ function sendAnswer(userKey){
     })
 }
 
+function returnPeer(userKey){
+    if (pcListMap.get(userKey)){
+        return pcListMap.get(userKey);
+    }
+
+    var localPeer = createPeer(userKey);
+    pcListMap.set(userKey, localPeer);
+    return localPeer;
+}
+
 function createPeer(userKey){
-    let peer = new RTCPeerConnection(configuration);
+    let peer = new RTCPeerConnection();
     console.log("createPeer called");
 
     // begin sending the local video across the peer connection
