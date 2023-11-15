@@ -1,18 +1,9 @@
+const offerOptions = {'offerToReceiveAudio':true,'offerToReceiveVideo':true};
 const remoteVideo = document.getElementById("remoteVideo");
 const myLocalKey = Math.random().toString(36).substring(2, 12);
 let stompClient;
-let localStream;
 let localPeer;
 
-
-async function getLocalStream(){
-    try {
-        localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-        console.log("succeed in getting localStream");
-    } catch (err) {
-        console.log("fail to get localStream");
-    }
-}
 
 async function connect() {
     return new Promise((resolve, reject) => {
@@ -51,7 +42,7 @@ function handleIceCandidate(iceCandidate){
 }
 
 function sendOffer() {
-    localPeer.createOffer().then(description => {
+    localPeer.createOffer(offerOptions).then(description => {
         localPeer.setLocalDescription(description);
         stompClient.send("/app/offer/" + camKey, {}, JSON.stringify({
             "userKey": myLocalKey,
@@ -62,10 +53,6 @@ function sendOffer() {
 
 function createPeer() {
     var peer = new RTCPeerConnection();
-
-    localStream.getTracks().forEach((track) => {
-        peer.addTrack(track, localStream);
-    })
 
     peer.ontrack = (event) => {
         remoteVideo.srcObject = event.streams[0];
@@ -84,7 +71,6 @@ function createPeer() {
 }
 
 async function main() {
-    await getLocalStream();
     await connect();
     sendOffer();
 }
