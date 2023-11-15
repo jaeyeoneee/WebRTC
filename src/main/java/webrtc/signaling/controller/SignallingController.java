@@ -19,28 +19,28 @@ public class SignallingController {
     @Autowired
     WebcamKeyRepository webcamKeyRepository;
 
-    @MessageMapping("/webcam/offer/{webcamId}")
-    @SendTo("/queue/webcam/offer/{webcamId}")
+    @MessageMapping("/offer/{webcamId}")
+    @SendTo("/queue/offer/{webcamId}")
     public String sendOffer(@Payload String offer, @DestinationVariable(value = "webcamId") String webcamId) {
         log.info("id={}, offer={}", webcamId, offer);
         return offer;
     }
 
-    @MessageMapping("/webcam/answer/{webcamId}")
-    @SendTo("/queue/webcam/answer/{webcamId}")
+    @MessageMapping("/answer/{webcamId}")
+    @SendTo("/queue/answer/{webcamId}")
     public String sendAnswer(@Payload String answer, @DestinationVariable(value = "webcamId") String webcamId) {
         log.info("id={}, answer={}", webcamId, answer);
         return answer;
     }
 
-    @MessageMapping("/webcam/iceCandidate/{webcamId}")
-    @SendTo("/queue/webcam/iceCandidate/{webcamId}")
+    @MessageMapping("/iceCandidate/{webcamId}")
+    @SendTo("/queue/iceCandidate/{webcamId}")
     public String sendIceCandidate(@Payload String iceCandidate, @DestinationVariable(value = "webcamId") String webcamId) {
         log.info("id={}, candidate={}", webcamId, iceCandidate);
         return iceCandidate;
     }
 
-    @MessageMapping("/webcam/initiate")
+    @MessageMapping("/initiate")
     public void webcamConnectionInitiate(@Payload String initiateKey) {
         Long id = webcamKeyRepository.save(initiateKey);
         log.info("id={}, initiateKey={}", id, initiateKey);

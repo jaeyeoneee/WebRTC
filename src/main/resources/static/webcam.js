@@ -1,104 +1,95 @@
-const video = document.getElementById("localVideo");
+const localVideo = document.getElementById("localVideo");
 const myCamKey = Math.random().toString(36).substring(2, 12);
 let pcListMap = new Map();
 let localStream;
+let stompClient;
 
 
 async function getLocalStream(){
     try {
         localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-        video.srcObject = localStream;
-        console.log("succeed localVideo");
+        localVideo.srcObject = localStream;
+        console.log("succeed in getting localStream");
     } catch (err) {
-        //TODO
-        console.log("fail local video");
+        console.log("fail to get localStream");
     }
 }
 
 async function connect(){
-    // connect to server, test done
-    const socket = new SockJS('/signaling');
-    stompClient = Stomp.over(socket);
-    stompClient.connect({}, function(frame){
-        console.log(frame);
+    return new Promise((resolve, reject) => {
+        var socket = new SockJS('/signaling');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function(frame) {
 
-        stompClient.subscribe('/queue/webcam/offer/' + myCamKey,  (offer) =>{
-            var userKey = JSON.parse(offer.body)["userKey"];
-            var userSDP = JSON.parse(offer.body)["offer"];
-            console.log("userKey="+userKey+", userSDP="+userSDP);
+            var offerSubscription = stompClient.subscribe('/queue/offer/' + myCamKey, handleOffer)
+            var iceSubscription = stompClient.subscribe('/queue/iceCandidate/' + myCamKey, handleIceCandidate)
 
-            var localPeer = returnPeer(userKey);
-            localPeer.setRemoteDescription(new RTCSessionDescription(userSDP))
-            sendAnswer(userKey);
-        })
+            if (offerSubscription && iceSubscription){
+                stompClient.send('/app/initiate', {}, myCamKey);
+                resolve();
+            }
+        });
+    });
+}
 
-        stompClient.subscribe('/queue/webcam/iceCandidate/' + myCamKey, (iceCandidate)=>{
-            var userKey = JSON.parse(iceCandidate.body)["userKey"];
-            var message = JSON.parse(iceCandidate.body)["candidate"];
+function handleOffer(offer){
+    var userKey = JSON.parse(offer.body)["userKey"];
+    var description = JSON.parse(offer.body)["description"];
 
-            var localPeer = returnPeer(userKey);
+    var localPeer = createPeer(userKey);
+    pcListMap.set(userKey, localPeer);
+    localPeer.setRemoteDescription(new RTCSessionDescription(description))
+    sendAnswer(userKey);
+}
 
-            candidate = new RTCIceCandidate({
-                candidate: message.candidate,
-                sdpMLineIndex: message.sdpMLineIndex,
-                sdpMid: message.sdpMid
-            })
+function handleIceCandidate(iceCandidate){
+    var userKey = JSON.parse(iceCandidate.body)["userKey"];
+    var description = JSON.parse(iceCandidate.body)["description"];
 
-            localPeer.addIceCandidate(candidate);
-        })
+    var localPeer = pcListMap.get(userKey);
 
-        //TODO:subscribe가 보장, 이후에 resolve 추가하면서
-        stompClient.send('/app/webcam/initiate', {}, myCamKey);
-
+    var candidate = new RTCIceCandidate({
+        candidate: description.candidate,
+        sdpMLineIndex: description.sdpMLineIndex,
+        sdpMid: description.sdpMid
     })
+
+    localPeer.addIceCandidate(candidate);
 }
 
 function sendAnswer(userKey){
-    let localPeer = pcListMap.get(userKey);
+    var localPeer = pcListMap.get(userKey);
     localPeer.createAnswer().then(description => {
         localPeer.setLocalDescription(description);
-        console.log("setting Local Description");
-        console.log(description);
-        stompClient.send("/app/webcam/answer/"+userKey, {}, JSON.stringify({
+        stompClient.send("/app/answer/"+userKey, {}, JSON.stringify({
             "camKey" : myCamKey,
-            "answer" : description
+            "description" : description
         }));
     })
 }
 
-function returnPeer(userKey){
-    if (pcListMap.get(userKey)){
-        return pcListMap.get(userKey);
-    }
-
-    var localPeer = createPeer(userKey);
-    pcListMap.set(userKey, localPeer);
-    return localPeer;
-}
-
 function createPeer(userKey){
-    let peer = new RTCPeerConnection();
-    console.log("createPeer called");
+    var peer = new RTCPeerConnection();
 
-    // begin sending the local video across the peer connection
     localStream.getTracks().forEach((track) => {
         peer.addTrack(track, localStream);
-        console.log("track added");
     })
 
     peer.onicecandidate = (event) => {
-        console.log("iceCandidate create!");
         if (event.candidate){
-            stompClient.send("/app/webcam/iceCandidate/"+userKey, {}, JSON.stringify({
+            stompClient.send("/app/iceCandidate/"+userKey, {}, JSON.stringify({
                 "camKey" : myCamKey,
-                "candidate" : event.candidate
+                "description" : event.candidate
             }))
         }
     }
-    console.log("peer created!");
-    console.log(peer);
+
     return peer;
 }
 
-getLocalStream();
-connect();
+async function main() {
+    await getLocalStream();
+    await connect();
+}
+
+main();
