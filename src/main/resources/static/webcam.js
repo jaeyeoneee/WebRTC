@@ -84,6 +84,13 @@ function createPeer(userKey){
         }
     }
 
+    peer.oniceconnectionstatechange = (event) => {
+        var iceConnectionState = peer.iceConnectionState;
+        if (iceConnectionState === 'disconnected' || iceConnectionState === 'failed' || iceConnectionState === 'closed'){
+            pcListMap.delete(userKey);
+        }
+    }
+
     return peer;
 }
 

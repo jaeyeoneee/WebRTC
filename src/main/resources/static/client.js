@@ -67,6 +67,13 @@ function createPeer() {
             }
     }
 
+    peer.oniceconnectionstatechange = (event) => {
+        var iceConnectionState = peer.iceConnectionState;
+        if (iceConnectionState === 'disconnected' || iceConnectionState === 'failed' || iceConnectionState === 'closed'){
+            window.location.href = "/client/redirect";
+        }
+    }
+
     return peer;
 }
 

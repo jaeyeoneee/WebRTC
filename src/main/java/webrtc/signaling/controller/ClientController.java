@@ -34,5 +34,10 @@ public class ClientController {
 
         return "client/channel-choose";
     }
+
+    @GetMapping("/client/redirect")
+    public String clientRedirect(){
+        return "client/redirect";
+    }
 }
 
