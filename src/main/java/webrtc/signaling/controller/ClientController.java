@@ -3,14 +3,17 @@ package webrtc.signaling.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import webrtc.signaling.domain.Webcam;
 import webrtc.signaling.repository.WebcamKeyRepository;
 import webrtc.signaling.repository.WebcamRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -18,6 +21,9 @@ import java.util.List;
 public class ClientController {
 
     private final WebcamRepository webcamRepository;
+
+    @Value("${connectionLimit}")
+    private int connectionLimit;
 
     @GetMapping("/client")
     public String clientChannels(Model model) {
@@ -31,8 +37,14 @@ public class ClientController {
     @GetMapping("/client/{displayInfo}")
     public String clientChannel(@PathVariable String displayInfo, Model model) {
 
-        String camKey = webcamRepository.getWebcamKeyByDisplayInfo(displayInfo);
-        model.addAttribute("camKey", camKey);
+        Webcam webcam = webcamRepository.getWebcamByWebcamDisplayName(displayInfo).get();
+
+        // 만약 해당 cam에 허용 이상의 사용자가 들어오면 연결 불가 안내 페이지로 간다.
+        if (webcam.getClientList().size() >= connectionLimit) {
+            return "client/limit";
+        }
+
+        model.addAttribute("camKey", webcam.getWebcamKey());
 
         return "client/channel-choose";
     }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import webrtc.signaling.domain.Webcam;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -64,5 +65,25 @@ class WebcamRepositoryTest {
 
         assertThat(hasSessionId).isTrue();
         assertThat(hasFakeSessionId).isFalse();
+    }
+
+    @Test
+    void getWebcamByWebcamSessionIdTest() {
+        Webcam webcam1 = new Webcam("testSessionId1", "testKey1", "testDisplay1");
+        webcamRepository.save(webcam1);
+
+        Webcam webcam = webcamRepository.getWebcamByWebcamSessionId("testSessionId1").get();
+
+        assertThat(webcam).isEqualTo(webcam1);
+    }
+
+    @Test
+    void getWebcamByWebcamDisplayName() {
+        Webcam webcam1 = new Webcam("testSessionId1", "testKey1", "testDisplay1");
+        webcamRepository.save(webcam1);
+
+        Webcam testDisplay1 = webcamRepository.getWebcamByWebcamDisplayName("testDisplay1").get();
+
+        assertThat(webcam1).isEqualTo(testDisplay1);
     }
 }

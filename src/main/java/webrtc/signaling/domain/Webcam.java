@@ -21,12 +21,4 @@ public class Webcam {
         this.displayInfo = displayInfo;
         this.clientList = new ArrayList<>();
     }
-
-    public void addClient(String clientSessionId) {
-        this.clientList.add(clientSessionId);
-    }
-
-    public void removeClient(String clientSessionId) {
-        this.clientList.remove(clientSessionId);
-    }
 }

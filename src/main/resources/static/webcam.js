@@ -86,7 +86,12 @@ function createPeer(userKey){
 
     peer.oniceconnectionstatechange = (event) => {
         var iceConnectionState = peer.iceConnectionState;
+        if (iceConnectionState === 'connected'){
+            stompClient.send("/app/connected", {}, userKey);
+        }
+
         if (iceConnectionState === 'disconnected' || iceConnectionState === 'failed' || iceConnectionState === 'closed'){
+            stompClient.send("/app/disconnected", {}, userKey);
             pcListMap.delete(userKey);
         }
     }

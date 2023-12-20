@@ -47,6 +47,8 @@ function sendOffer() {
         stompClient.send("/app/offer/" + camKey, {}, JSON.stringify({
             "userKey": myLocalKey,
             "description": description
+
+
         }));
     });
 }
@@ -69,6 +71,7 @@ function createPeer() {
 
     peer.oniceconnectionstatechange = (event) => {
         var iceConnectionState = peer.iceConnectionState;
+
         if (iceConnectionState === 'disconnected' || iceConnectionState === 'failed' || iceConnectionState === 'closed'){
             window.location.href = "/client/redirect";
         }

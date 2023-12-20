@@ -25,6 +25,5 @@ public class WebSocketEventListener {
             webcamRepository.removeWebcamBySessionId(sessionId);
             log.info("delete webcam={}", sessionId);
         }
-        // client인 경우
     }
 }

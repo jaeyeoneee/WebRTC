@@ -14,6 +14,8 @@ import webrtc.signaling.domain.Webcam;
 import webrtc.signaling.repository.WebcamKeyRepository;
 import webrtc.signaling.repository.WebcamRepository;
 
+import java.util.Optional;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -48,10 +50,32 @@ public class SignallingController {
         SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.wrap(message);
         String sessionId = headerAccessor.getSessionId();
 
-        //TODO:diplayName 변경
+        //TODO:displayName 변경
         Webcam webcam = new Webcam(sessionId, initiateKey, String.valueOf(++sequence));
         webcamRepository.save(webcam);
 
         log.info("new webcam={}", webcam);
+    }
+
+    @MessageMapping("/connected")
+    public void webcamConnected(@Payload String userKey, Message<String> message) {
+        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.wrap(message);
+        String sessionId = headerAccessor.getSessionId();
+
+        // 웹캠을 sessionId를 이용해 찾은 다음 clientList에 해당 userKey를 넣어준다.
+        Webcam webcam = webcamRepository.getWebcamByWebcamSessionId(sessionId).get();
+        webcam.getClientList().add(userKey);
+        log.info("CONNECTED: sessionId={}, key={}, displayName={}, clientList={}", webcam.getWebcamSessionID(), webcam.getWebcamKey(), webcam.getDisplayInfo(), webcam.getClientList());
+    }
+
+    @MessageMapping("/disconnected")
+    public void webcamDisconnected(@Payload String userKey, Message<String> message) {
+        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.wrap(message);
+        String sessionId = headerAccessor.getSessionId();
+
+        //웹캠을 sessionId를 이용해 찾은 다음 clientList에서 해당 userKey를 제거한다.
+        Webcam webcam = webcamRepository.getWebcamByWebcamSessionId(sessionId).get();
+        webcam.getClientList().remove(userKey);
+        log.info("DISCONNECTED: sessionId={}, key={}, displayName={}, clientList={}", webcam.getWebcamSessionID(), webcam.getWebcamKey(), webcam.getDisplayInfo(), webcam.getClientList());
     }
 }
