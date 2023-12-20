@@ -8,16 +8,19 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
+import webrtc.signaling.domain.Webcam;
 import webrtc.signaling.repository.WebcamKeyRepository;
+import webrtc.signaling.repository.WebcamRepository;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class SignallingController {
 
-    @Autowired
-    WebcamKeyRepository webcamKeyRepository;
+    private final WebcamRepository webcamRepository;
+    private Long sequence = 0L;
 
     @MessageMapping("/offer/{webcamId}")
     @SendTo("/queue/offer/{webcamId}")
@@ -41,8 +44,14 @@ public class SignallingController {
     }
 
     @MessageMapping("/initiate")
-    public void webcamConnectionInitiate(@Payload String initiateKey) {
-        Long id = webcamKeyRepository.save(initiateKey);
-        log.info("id={}, initiateKey={}", id, initiateKey);
+    public void webcamConnectionInitiate(@Payload String initiateKey, Message<String> message) {
+        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.wrap(message);
+        String sessionId = headerAccessor.getSessionId();
+
+        //TODO:diplayName 변경
+        Webcam webcam = new Webcam(sessionId, initiateKey, String.valueOf(++sequence));
+        webcamRepository.save(webcam);
+
+        log.info("new webcam={}", webcam);
     }
 }

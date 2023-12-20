@@ -7,9 +7,9 @@
 <body>
 
 <ul>
-    <span th:each="id :${ids}">
-        <a th:href="'/client/' + ${id}">
-            <button th:text="${id}"></button>
+    <span th:each="displayInfo :${allDisplayInfo}">
+        <a th:href="'/client/' + ${displayInfo}">
+            <button th:text="${displayInfo}"></button>
         </a>
     </span>
 </ul>
