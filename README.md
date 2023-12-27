@@ -29,7 +29,36 @@
  * aiortc를 사용함으로 openCV로 웹캠 영상을 더욱 정교하게 처리할 수 있다.
  * 이후 자율주행 자동차의 컴퓨터가 켜질 때 자동으로 프로그램이 실행되어 서버에 연결될 수 있게 한다.
 
-## 시작 가이드
+##  Getting Started
+### Requirements
+For building and running the application you need:
+* [Oracle JDK 17](https://www.oracle.com/java/technologies/downloads/#java17)
+
+### Installation
+```bash
+git clone https://github.com/jaeyeoneee/WebRTC.git
+cd WebRTC
+```
+
+### Execution
+1. Build the application
+```bash
+./gradlew build
+```
+
+2. Run the application
+```bash
+java -jar build/libs/signaling-0.0.1.jar
+```
+3. Register a webcam
+
+   
+    Visit "/webcam" to register a webcam.
+
+4. Select a webcam video and streaming URL
+
+    
+    Visit "/client" to select a webcam video and get the streaming URL.
 
 ## Stacks :book:
 **Environment**
@@ -42,7 +71,7 @@
 
 **Development**
 <p>
-  <span><img src="https://img.shields.io/badge/openJDK-437291?style=for-the-badge&logo=openjdk&logoColor=white"></span>
+  <span><img src="https://img.shields.io/badge/JAVA-437291?style=for-the-badge&logoColor=white"></span>
   <span><img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=white"></span>
   <span><img src="https://img.shields.io/badge/WebRTC-333333?style=for-the-badge&logo=WebRTC&logoColor=white"></span>
   <span><img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"></span>
