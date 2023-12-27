@@ -40,7 +40,7 @@ class SignallingControllerTest {
 
         ArrayBlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(1);
 
-        stompSession.subscribe("/queue/webcam/offer/1", new StompFrameHandler() {
+        stompSession.subscribe("/queue/offer/1", new StompFrameHandler() {
             @NonNull
             @Override
             public Type getPayloadType(@NonNull StompHeaders headers) {
@@ -53,7 +53,7 @@ class SignallingControllerTest {
             }
         });
 
-        stompSession.send("/app/webcam/offer/1", "hello");
+        stompSession.send("/app/offer/1", "hello");
 
         await().atMost(1, SECONDS).untilAsserted(()-> assertEquals("hello", blockingQueue.poll()));
     }
@@ -68,7 +68,7 @@ class SignallingControllerTest {
 
         ArrayBlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(1);
 
-        stompSession.subscribe("/queue/webcam/answer/1", new StompFrameHandler() {
+        stompSession.subscribe("/queue/answer/1", new StompFrameHandler() {
             @NonNull
             @Override
             public Type getPayloadType(@NonNull StompHeaders headers) {
@@ -81,7 +81,7 @@ class SignallingControllerTest {
             }
         });
 
-        stompSession.send("/app/webcam/answer/1", "hello");
+        stompSession.send("/app/answer/1", "hello");
 
         await().atMost(1, SECONDS).untilAsserted(()-> assertEquals("hello", blockingQueue.poll()));
 
@@ -97,7 +97,7 @@ class SignallingControllerTest {
 
         ArrayBlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(1);
 
-        stompSession.subscribe("/queue/webcam/iceCandidate/1", new StompFrameHandler() {
+        stompSession.subscribe("/queue/iceCandidate/1", new StompFrameHandler() {
             @NonNull
             @Override
             public Type getPayloadType(@NonNull StompHeaders headers) {
@@ -110,7 +110,7 @@ class SignallingControllerTest {
             }
         });
 
-        stompSession.send("/app/webcam/iceCandidate/1", "hello");
+        stompSession.send("/app/iceCandidate/1", "hello");
 
         await().atMost(1, SECONDS).untilAsserted(()-> assertEquals("hello", blockingQueue.poll()));
     }
