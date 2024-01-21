@@ -1,9 +1,11 @@
 const offerOptions = {'offerToReceiveAudio':true,'offerToReceiveVideo':true};
 const remoteVideo = document.getElementById("remoteVideo");
+const messageInput = document.getElementById("message");
+const sendButton = document.getElementById("sendButton")
 const myLocalKey = Math.random().toString(36).substring(2, 12);
 let stompClient;
 let localPeer;
-
+let localChannel;
 
 async function connect() {
     return new Promise((resolve, reject) => {
@@ -47,14 +49,14 @@ function sendOffer() {
         stompClient.send("/app/offer/" + camKey, {}, JSON.stringify({
             "userKey": myLocalKey,
             "description": description
-
-
         }));
     });
 }
 
+// todo: peer, channel 변수 반환할지 결정
 function createPeer() {
     var peer = new RTCPeerConnection();
+    localChannel = peer.createDataChannel("chat");
 
     peer.ontrack = (event) => {
         remoteVideo.srcObject = event.streams[0];
@@ -75,6 +77,20 @@ function createPeer() {
         if (iceConnectionState === 'disconnected' || iceConnectionState === 'failed' || iceConnectionState === 'closed'){
             window.location.href = "/client/redirect";
         }
+    }
+
+    // 데이터 채널: 채팅
+    localChannel.onopen = (event) => {
+        console.log("Data Channel opened");
+        sendButton.addEventListener("click", () => {
+                const message = messageInput.value;
+                localChannel.send(message);
+                messageInput.value = "";
+            });
+    };
+
+    localChannel.onmessage= (event) => {
+        console.log(event.data);
     }
 
     return peer;
