@@ -56,7 +56,8 @@ function sendOffer() {
 // todo: peer, channel 변수 반환할지 결정
 function createPeer() {
     var peer = new RTCPeerConnection();
-    localChannel = peer.createDataChannel("chat");
+    // reliable, ordered datachannel
+    localChannel = peer.createDataChannel("chat", { ordered: true});
 
     peer.ontrack = (event) => {
         remoteVideo.srcObject = event.streams[0];
