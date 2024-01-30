@@ -29,6 +29,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.awaitility:awaitility:4.2.0'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	// https://mvnrepository.com/artifact/org.json/json
+	implementation group: 'org.json', name: 'json', version: '20230227'
 }
 
 tasks.named('test') {
