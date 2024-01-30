@@ -1,7 +1,9 @@
 package webrtc.signaling.controller;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -14,7 +16,6 @@ import webrtc.signaling.domain.Webcam;
 import webrtc.signaling.repository.WebcamKeyRepository;
 import webrtc.signaling.repository.WebcamRepository;
 
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -46,14 +47,21 @@ public class SignallingController {
     }
 
     @MessageMapping("/initiate")
-    public void webcamConnectionInitiate(@Payload String initiateKey, Message<String> message) {
+    public void webcamConnectionInitiate(@Payload String initiateMsg, Message<String> message) {
         SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.wrap(message);
         String sessionId = headerAccessor.getSessionId();
 
-        //TODO:displayName 변경
-        Webcam webcam = new Webcam(sessionId, initiateKey, String.valueOf(++sequence));
-        webcamRepository.save(webcam);
+        JSONObject parser = new JSONObject(initiateMsg);
+        String camKey = parser.optString("camKey");
+        String displayName = parser.optString("display");
 
+        Webcam webcam;
+        if (displayName.equals("")){
+            webcam = new Webcam(sessionId, camKey, String.valueOf(++sequence));
+        } else {
+            webcam = new Webcam(sessionId, camKey, displayName);
+        }
+        webcamRepository.save(webcam);
         log.info("new webcam={}", webcam);
     }
 
