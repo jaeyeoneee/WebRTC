@@ -91,7 +91,7 @@ function createPeer() {
     };
 
     localChannel.onmessage= (event) => {
-        console.log(event.data);
+        alert(event.data);
     }
 
     return peer;
