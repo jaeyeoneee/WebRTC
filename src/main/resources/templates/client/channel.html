@@ -42,18 +42,50 @@
             color: black;
             border: 2px solid #4CAF50;
         }
-
     </style>
 </head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js" integrity="sha512-1QvjE7BtotQjkq8PxLeF6P46gEpBRXuskzIVgjFpekzFVF4yjRgrQvTG1MTOJ3yQgvTteKAcO7DSZI92+u/yZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" integrity="sha512-iKDtgDyTHjAitUDdLljGhenhPwrbBfqTKWO1mkhSFH3A7blITC9MhYon6SjnMhp4o0rADGw9yAC6EW4t5a4K3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <body>
 
-<ul>
+<ul id="webcamList">
     <span th:each="displayInfo :${allDisplayInfo}">
         <a th:href="'/client/' + ${displayInfo}">
             <button th:text="${displayInfo}"></button>
         </a>
     </span>
 </ul>
+
+<script th:inline="javascript">
+    var socket = new SockJS('/signaling');
+    var stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+
+        stompClient.subscribe('/queue/updateDisplayInfo', function (message) {
+            // 메시지 도착 시 실행되는 콜백 함수
+            var updatedWebcamList = JSON.parse(message.body);
+
+            // 기존 버튼들을 제거
+            document.getElementById('webcamList').innerHTML = "";
+
+            // 갱신된 웹캠 정보로 버튼을 다시 생성
+            updatedWebcamList.forEach(function (webcamInfo) {
+                var button = document.createElement('button');
+                button.innerHTML = webcamInfo;
+                button.onclick = function () {
+                    // 클릭 시 특정 URL로 이동
+                    window.location.href = '/client/' + webcamInfo;
+                };
+
+                var span = document.createElement('span');
+                span.appendChild(button);
+                document.getElementById('webcamList').appendChild(span);
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

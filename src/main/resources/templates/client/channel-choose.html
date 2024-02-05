@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-qv7c2mY99pGOeBfKI1UNprIBsyNfWwFhxS5Xs3p/dpbrJF1vYKtT5SfL3s+kg9EmNyHV4R1p6aR+NUZ3UOOPeaIg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             display: flex;
@@ -42,6 +44,25 @@
             font-size: 16px;
             cursor: pointer;
         }
+
+        /* 뒤로가기 버튼 스타일 */
+        .back-button {
+            background-color: #8B4513; /* 갈색 */
+            color: white;
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 화살표 아이콘 스타일 */
+        .back-icon {
+            margin-right: 5px;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js" integrity="sha512-1QvjE7BtotQjkq8PxLeF6P46gEpBRXuskzIVgjFpekzFVF4yjRgrQvTG1MTOJ3yQgvTteKAcO7DSZI92+u/yZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" integrity="sha512-iKDtgDyTHjAitUDdLljGhenhPwrbBfqTKWO1mkhSFH3A7blITC9MhYon6SjnMhp4o0rADGw9yAC6EW4t5a4K3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -63,9 +84,21 @@
         Send
     </button>
 </div>
+
+<!-- 뒤로가기 버튼 -->
+<button class="back-button" onclick="goBack()">
+    <i class="fas fa-arrow-left back-icon"></i> Back
+</button>
+
 <script th:inline="javascript">
-        var camKey = [[${camKey}]];
-    </script>
+    var camKey = [[${camKey}]];
+</script>
 <script src="/client.js"></script>
+
+<script>
+    function goBack() {
+        window.location.href = '/client'; // "/client"로 이동
+    }
+</script>
 </body>
 </html>
