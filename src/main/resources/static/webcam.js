@@ -25,7 +25,7 @@ async function connect(){
             var iceSubscription = stompClient.subscribe('/queue/iceCandidate/' + myCamKey, handleIceCandidate)
 
             if (offerSubscription && iceSubscription){
-                stompClient.send('/app/initiate', {}, myCamKey);
+                stompClient.send('/app/initiate', {}, JSON.stringify({"camKey" : myCamKey, "display" : null}));
                 resolve();
             }
         });
@@ -93,6 +93,16 @@ function createPeer(userKey){
         if (iceConnectionState === 'disconnected' || iceConnectionState === 'failed' || iceConnectionState === 'closed'){
             stompClient.send("/app/disconnected", {}, userKey);
             pcListMap.delete(userKey);
+        }
+    }
+
+    peer.ondatachannel = (event) => {
+        receivedChannel = event.channel;
+        receivedChannel.onmessage= (msg) => {
+        //메시지를 받으면 로그로 남기고, "전송 성공" 메시지 전송
+        //상황에 따라 기능 변경 가능
+            console.log("received data=" + msg.data);
+            receivedChannel.send("전송 성공");
         }
     }
 
