@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-qv7c2mY99pGOeBfKI1UNprIBsyNfWwFhxS5Xs3p/dpbrJF1vYKtT5SfL3s+kg9EmNyHV4R1p6aR+NUZ3UOOPeaIg=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://kit.fontawesome.com/46d0b7c749.js" crossorigin="anonymous"></script>
     <style>
         body {
             display: flex;
@@ -47,8 +46,8 @@
 
         /* 뒤로가기 버튼 스타일 */
         .back-button {
-            background-color: #8B4513; /* 갈색 */
-            color: white;
+            background-color: transparent; /* Transparent background */
+            color: #8B4513; /* Brown color for the arrow */
             padding: 8px 16px;
             font-size: 16px;
             cursor: pointer;
@@ -57,6 +56,9 @@
             margin-top: 10px;
             display: flex;
             align-items: center;
+            position: absolute; /* Position absolute for placement */
+            left: 10px; /* Adjust left position as needed */
+            top: 10px; /* Adjust top position as needed */
         }
 
         /* 화살표 아이콘 스타일 */
@@ -87,11 +89,11 @@
 
 <!-- 뒤로가기 버튼 -->
 <button class="back-button" onclick="goBack()">
-    <i class="fas fa-arrow-left back-icon"></i> Back
+    <i class="fa-solid fa-arrow-left fa-2x"></i>
 </button>
 
 <script th:inline="javascript">
-    var camKey = [[${camKey}]];
+    var camKey = [[${camKey}]];sty
 </script>
 <script src="/client.js"></script>
 
