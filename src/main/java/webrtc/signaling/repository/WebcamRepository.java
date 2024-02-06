@@ -64,12 +64,8 @@ public class WebcamRepository {
                 .filter(webcam -> webcam.getDisplayInfo().equals(displayName))
                 .findFirst();
     }
-    
-    //TODO: repository 함수 수정
-
 
     public void clear(){
         webcamList.clear();
     }
-
 }

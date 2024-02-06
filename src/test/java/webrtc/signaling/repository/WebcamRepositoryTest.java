@@ -3,6 +3,7 @@ package webrtc.signaling.repository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import webrtc.signaling.domain.Webcam;
 
 import java.util.List;
@@ -13,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class WebcamRepositoryTest {
 
-    private final WebcamRepository webcamRepository = new WebcamRepository();
+    private final ApplicationEventPublisher eventPublisher = event -> {};
+    private final WebcamRepository webcamRepository = new WebcamRepository(eventPublisher);
 
     @BeforeEach
     void beforeEach() {
