@@ -13,9 +13,7 @@
 
 ## 프로젝트 소개
 * WebRTC를 이용해 자율주행 자동차와 사용자 간에 P2P 연결을 맺고, 자율주행 자동차 웹캠 영상을 실시간으로 스트리밍 하는 프로그램
-
 * 채팅 기능을 통해 사용자가 자동차 프로그램에 명령어를 전달할 수 있다.
-* 스프링 부트 stomp 서버를 sdp를 교환하는 signaling 서버로 한다.
 * 두 단계로 나누어 1단계는 자바스크립트 webrtc API로 기능을 구현하고, 검증이 완료되면 이후에 웹캠 측을 파이썬 aiortc로 변경한다.
 
 #### STEP 1: 해당 레포지토리
@@ -194,7 +192,7 @@ java -jar build/libs/signaling-0.0.1.jar
   * sendIceCandidate: ice candidate 전달을 위한 메시지 매핑 컨트롤러
   * webcamConnectionInitiate: 초기 웹캠이 연결될 때, 고유 id, display 정보를 웹캠 레포지토리에 저장
   * webcamConnected: 사용자와 P2P 연결을 맺었을 때, 웹캠이 해당 컨트롤러로 사용자 id 전달, 웹캠 레포지토리의 객체에 사용자 추가
-  * webCamDisconnected: 사용자와 P2P 연겨을 끊어졌을 때, 웹캠이 해당 컨트롤러로 사용자 id 전달, 웹캠 레포지토리의 객체에 사용자 제거
+  * webCamDisconnected: 사용자와의 P2P 연결이 끊어졌을 때, 웹캠이 해당 컨트롤러로 사용자 id 전달, 웹캠 레포지토리의 객체에 사용자 제거
 
 
 * **Webcam.java**
